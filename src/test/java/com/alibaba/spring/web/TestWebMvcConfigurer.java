@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Test {@link WebMvcConfigurer}
  *
- * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
+ * @author @throws Exception execution {@link Exception}
  * @since 1.0.0
  */
 public class TestWebMvcConfigurer extends WebMvcConfigurerAdapter {

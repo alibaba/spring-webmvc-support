@@ -41,7 +41,7 @@ import static org.springframework.web.context.ContextLoader.GLOBAL_INITIALIZER_C
 /**
  * Web MVC Utilities Class
  *
- * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
+ * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @version 1.0.1
  * @see ServletContext
  * @since 1.0.0 2016-10-10
@@ -266,7 +266,7 @@ public abstract class WebMvcUtils {
     /**
      * Get {@link ServletContext} in current {@link HttpServletRequest request}
      *
-     * @return
+     * @return current request {@link ServletContext}
      * @throws IllegalStateException If current web environment could not be in Servlet Container with Spring Web MVC
      * @see RequestContextHolder#getRequestAttributes()
      * @see FrameworkServlet#initContextHolders(HttpServletRequest, LocaleContext, RequestAttributes)

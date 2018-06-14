@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Web Utilities Class
  *
- * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
+ * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebUtils
  * @since 1.0.1 2016-10-20
  */

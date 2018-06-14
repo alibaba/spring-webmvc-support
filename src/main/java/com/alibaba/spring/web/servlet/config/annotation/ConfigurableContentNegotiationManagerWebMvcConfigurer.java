@@ -146,24 +146,18 @@ public class ConfigurableContentNegotiationManagerWebMvcConfigurer extends WebMv
     /**
      * <code>
      * properties.put("a.b.1", "1");
-     * <p>
      * properties.put("a.b.2", "2");
-     * <p>
      * properties.put("d.e.f.1", "1");
-     * <p>
      * properties.put("d.e.f.2", "2");
-     * <p>
      * properties.put("d.e.f.3", "3");
      * </code>
-     * <p>
      * resolved result :
-     * <p>
      * <code>
      * {a={b={1=1, 2=2}}, d={e={f={1=1, 2=2, 3=3}}}}
      * </code>
      *
-     * @param properties
-     * @return
+     * @param properties Properties
+     * @return Resolved properties
      */
     public static Map<String, Object> resolveNestedMap(Map<String, String> properties) {
 

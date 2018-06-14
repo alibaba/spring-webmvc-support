@@ -117,12 +117,14 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
     /**
      * This implementation is empty.
      *
-     * @param request
-     * @param response
-     * @param handlerMethod
-     * @param annotation
-     * @return
-     * @throws Exception
+     * @param request       {@link HttpServletRequest}
+     * @param response      {@link HttpServletResponse}
+     * @param handlerMethod Spring MVC {@link HandlerMethod}
+     * @param annotation    {@link A Annotation} instance
+     * @return {@code true} if the execution chain should proceed with the
+     * next interceptor or the handler itself. Else, DispatcherServlet assumes
+     * that this interceptor has already dealt with the response itself.
+     * @throws Exception execution {@link Exception}
      */
     protected boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                                 HandlerMethod handlerMethod, A annotation) throws Exception {
@@ -134,12 +136,12 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
     /**
      * This implementation is empty.
      *
-     * @param request
-     * @param response
-     * @param handlerMethod
-     * @param annotation
-     * @param modelAndView
-     * @throws Exception
+     * @param request       {@link HttpServletRequest}
+     * @param response      {@link HttpServletResponse}
+     * @param handlerMethod Spring MVC {@link HandlerMethod}
+     * @param annotation    {@link A Annotation} instance
+     * @param modelAndView  Spring MVC {@link ModelAndView}
+     * @throws Exception execution {@link Exception}
      */
     protected void postHandle(HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod,
                               A annotation, ModelAndView modelAndView) throws Exception {
@@ -149,12 +151,12 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
     /**
      * This implementation is empty.
      *
-     * @param request
-     * @param response
-     * @param handlerMethod
-     * @param annotation
-     * @param ex
-     * @throws Exception
+     * @param request       {@link HttpServletRequest}
+     * @param response      {@link HttpServletResponse}
+     * @param handlerMethod Spring MVC {@link HandlerMethod}
+     * @param annotation    {@link A Annotation} instance
+     * @param ex            {@link HandlerMethod} execution {@link Exception}
+     * @throws Exception execution {@link Exception}
      */
     protected void afterCompletion(HttpServletRequest request, HttpServletResponse response, HandlerMethod handlerMethod,
                                    A annotation, Exception ex) throws Exception {
@@ -164,11 +166,11 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
     /**
      * This implementation is empty.
      *
-     * @param request
-     * @param response
-     * @param handlerMethod
-     * @param annotation
-     * @throws Exception
+     * @param request       {@link HttpServletRequest}
+     * @param response      {@link HttpServletResponse}
+     * @param handlerMethod Spring MVC {@link HandlerMethod}
+     * @param annotation    {@link A Annotation} instance
+     * @throws Exception execution {@link Exception}
      */
     protected void afterConcurrentHandlingStarted(HttpServletRequest request, HttpServletResponse response,
                                                   HandlerMethod handlerMethod, A annotation) throws Exception {
