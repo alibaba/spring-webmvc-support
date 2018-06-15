@@ -1,7 +1,6 @@
 package com.alibaba.spring.web.util;
 
 import org.springframework.core.MethodParameter;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
 
 import java.lang.annotation.Annotation;
@@ -12,7 +11,6 @@ import java.util.Map;
 /**
  * {@link HandlerMethod} Utilities
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see HandlerMethod
  * @since 2017.01.12
@@ -33,7 +31,7 @@ public abstract class HandlerMethodUtils {
      */
     public static <A extends Annotation> Map<ElementType, List<A>> findAnnotations(HandlerMethod handlerMethod,
                                                                                    Class<A> annotationClass) {
-        return com.alibaba.spring.util.AnnotationUtils.findAnnotations(handlerMethod.getMethod(),annotationClass);
+        return com.alibaba.spring.util.AnnotationUtils.findAnnotations(handlerMethod.getMethod(), annotationClass);
     }
 
     /**

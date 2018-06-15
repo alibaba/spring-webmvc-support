@@ -24,7 +24,6 @@ import java.util.Locale;
 /**
  * {@link ExclusiveViewResolverApplicationListener} Test
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see ExclusiveViewResolverApplicationListener
  * @since 2017.03.23

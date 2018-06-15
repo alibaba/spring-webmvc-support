@@ -8,7 +8,6 @@ import org.springframework.mock.web.MockServletContext;
 /**
  * {@link WebUtils} Test
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see WebUtils
  * @since 2017.01.13

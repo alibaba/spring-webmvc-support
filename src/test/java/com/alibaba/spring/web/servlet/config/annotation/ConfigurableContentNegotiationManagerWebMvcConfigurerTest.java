@@ -17,7 +17,6 @@ import static org.springframework.http.MediaType.*;
 /**
  * {@link ConfigurableContentNegotiationManagerWebMvcConfigurer} Test
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see ConfigurableContentNegotiationManagerWebMvcConfigurer
  * @since 2017.03.23

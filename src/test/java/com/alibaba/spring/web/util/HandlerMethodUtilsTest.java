@@ -14,7 +14,6 @@ import java.util.Map;
 /**
  * {@link HandlerMethodUtils} Test
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see HandlerMethodUtils
  * @since 2017.01.12

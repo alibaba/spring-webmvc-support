@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Abstract Page Render Context {@link HandlerInterceptor}
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see HandlerInterceptor
  * @since 2017.02.01

@@ -14,7 +14,6 @@ import java.util.Map;
 /**
  * Exclusive {@link ViewResolver} {@link ApplicationListener} on {@link ContextRefreshedEvent}
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see ViewResolver
  * @see ApplicationListener

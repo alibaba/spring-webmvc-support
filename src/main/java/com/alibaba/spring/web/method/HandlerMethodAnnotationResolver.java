@@ -14,7 +14,6 @@ import java.util.Map;
 /**
  * {@link HandlerMethod} {@link Annotation} Resolver
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see HandlerMethod
  * @see Annotation

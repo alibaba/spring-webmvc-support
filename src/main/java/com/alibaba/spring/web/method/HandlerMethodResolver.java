@@ -18,7 +18,6 @@ import static com.alibaba.spring.web.util.WebUtils.getServletContext;
 /**
  * {@link HandlerMethod} Resolver
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see HandlerMethod
  * @since 2017.02.02

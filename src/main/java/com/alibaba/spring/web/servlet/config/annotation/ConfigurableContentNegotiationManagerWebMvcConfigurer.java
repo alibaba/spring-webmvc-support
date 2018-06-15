@@ -19,7 +19,6 @@ import java.util.Map;
 /**
  * Configurable {@link ContentNegotiationManager} {@link WebMvcConfigurer}
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see ContentNegotiationManager
  * @see WebMvcConfigurer

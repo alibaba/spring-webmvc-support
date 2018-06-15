@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * {@link AbstractPageRenderContextHandlerInterceptor} Test
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see AbstractPageRenderContextHandlerInterceptor
  * @since 2017.02.01

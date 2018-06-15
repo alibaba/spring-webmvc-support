@@ -13,8 +13,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -25,7 +23,6 @@ import static org.springframework.web.servlet.DispatcherServlet.WEB_APPLICATION_
 /**
  * {@link HandlerMethodResolver}
  *
- * @author <a href="mailto:taogu.mxx@alibaba-inc.com">taogu.mxx</a> (Office)
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see HandlerMethodResolver
  * @since 2017.02.02
