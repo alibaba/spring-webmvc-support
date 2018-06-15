@@ -11,8 +11,7 @@ An support project of Spring Web MVC
 | Java           | 1.6 +         |
 | Servlet        | 2.5 +         |
 | Spring Web MVC | 3.2 +         |
-| [Alibaba Spring Support](https://github.com/alibaba/spring-context-support) | 1.0.0 + |
-
+| [Alibaba Spring Context Support](https://github.com/alibaba/spring-context-support) | 1.0.0 + |
 
 
 
