@@ -40,7 +40,7 @@ An support project of Spring Web MVC
     <dependency>
         <groupId>com.alibaba.spring</groupId>
         <artifactId>spring-webmvc-support</artifactId>
-        <version>1.0.0.RELEASE</version>
+        <version>1.0.1-SNAPSHOT</version>
     </dependency>
 
     ......

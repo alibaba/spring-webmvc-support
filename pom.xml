@@ -15,13 +15,13 @@
     <version>${revision}</version>
 
     <properties>
-        <revision>1.0.0.RELEASE</revision>
+        <revision>1.0.1-SNAPSHOT</revision>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <!-- Servlet -->
         <servlet-api.version>3.1.0</servlet-api.version>
         <!-- Spring Framework -->
-        <spring.framework.version>4.3.17.RELEASE</spring.framework.version>
+        <spring.framework.version>4.3.18.RELEASE</spring.framework.version>
     </properties>
     <scm>
         <connection>git@github.com:alibaba/spring-webmvc-support.git</connection>
@@ -131,23 +131,26 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
                 </plugins>
             </build>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -1,11 +1,15 @@
 package com.alibaba.spring.web.servlet.handler;
 
-import com.alibaba.spring.web.method.HandlerMethodResolver;
-import org.springframework.core.annotation.AnnotationUtils;
+import com.alibaba.spring.web.method.HandlerMethodRepository;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,8 +18,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 /**
  * {@link Annotation Annotated} {@link HandlerMethod} {@link HandlerInterceptor} Adapter
@@ -26,18 +33,27 @@ import java.util.concurrent.ConcurrentMap;
  * @see HandlerInterceptor
  * @since 2017.06.21
  */
-public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotation> extends HandlerInterceptorAdapter {
+public abstract class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotation> extends
+        WebMvcConfigurerAdapter implements AsyncHandlerInterceptor, ApplicationListener<ContextRefreshedEvent> {
 
     private final Class<A> annotationType;
 
-    private final ConcurrentMap<Method, A> annotatedMethodsCache;
+    private final Map<HandlerMethod, A> annotatedMethodsCache;
+
+    private ApplicationContext applicationContext;
 
     protected AnnotatedHandlerMethodHandlerInterceptorAdapter() {
 
         annotationType = resolveAnnotationType();
 
-        annotatedMethodsCache = new ConcurrentHashMap<Method, A>();
+        annotatedMethodsCache = new HashMap<HandlerMethod, A>();
 
+    }
+
+    @Override
+    public final void addInterceptors(InterceptorRegistry registry) {
+        // Add Itself
+        registry.addInterceptor(this);
     }
 
     public final boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -49,12 +65,9 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
 
             return preHandle(request, response, (HandlerMethod) handler, annotation);
 
-
-        } else {
-
-            return super.preHandle(request, response, handler);
-
         }
+
+        return true;
 
     }
 
@@ -66,10 +79,6 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
         if (annotation != null) {
 
             postHandle(request, response, (HandlerMethod) handler, annotation, modelAndView);
-
-        } else {
-
-            super.postHandle(request, response, handler, modelAndView);
 
         }
 
@@ -88,10 +97,6 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
 
             afterCompletion(request, response, (HandlerMethod) handler, annotation, ex);
 
-        } else {
-
-            super.afterCompletion(request, response, handler, ex);
-
         }
 
     }
@@ -105,10 +110,6 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
         if (annotation != null) {
 
             afterConcurrentHandlingStarted(request, response, (HandlerMethod) handler, annotation);
-
-        } else {
-
-            super.afterConcurrentHandlingStarted(request, response, handler);
 
         }
 
@@ -177,6 +178,23 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
 
     }
 
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        ApplicationContext applicationContext = event.getApplicationContext();
+
+        this.applicationContext = applicationContext;
+
+        HandlerMethodRepository repository = new HandlerMethodRepository();
+
+        repository.onApplicationEvent(event);
+
+        Collection<HandlerMethod> handlerMethods = repository.getHandlerMethods(applicationContext);
+
+        initHandlerMethods(handlerMethods);
+
+    }
+
     /**
      * Annotation type
      *
@@ -184,50 +202,6 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
      */
     public final Class<A> getAnnotationType() {
         return annotationType;
-    }
-
-    private static Collection<HandlerMethod> resolveHandlerMethods(HttpServletRequest request) {
-
-        HandlerMethodResolver resolver = new HandlerMethodResolver();
-
-        return resolver.resolveHandlerMethods(request);
-
-    }
-
-    private A getAnnotation(Object handler) {
-
-        A annotation = null;
-
-        if (handler instanceof HandlerMethod) {
-
-            HandlerMethod handlerMethod = (HandlerMethod) handler;
-
-            Method method = handlerMethod.getMethod();
-
-            annotation = annotatedMethodsCache.get(method);
-
-            if (annotation == null) {
-
-                annotation = AnnotationUtils.findAnnotation(method, annotationType);
-
-                if (annotation == null) {
-
-                    annotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), annotationType);
-
-                }
-
-                if (annotation != null) {
-
-                    annotatedMethodsCache.putIfAbsent(method, annotation);
-
-                }
-
-            }
-
-        }
-
-        return annotation;
-
     }
 
     private final Class<A> resolveAnnotationType() {
@@ -239,5 +213,66 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends Annotatio
         return (Class<A>) actualTypeArguments[0];
 
     }
+
+    /**
+     * Get an annotated {@link Annotation} instance from somewhere,e.g {@link HandlerMethod}
+     *
+     * @param handler {@link HandlerMethod}
+     * @return
+     */
+    protected A getAnnotation(Object handler) {
+        return annotatedMethodsCache.get(handler);
+    }
+
+    /**
+     * Find all {@link HandlerMethod } in current {@link ApplicationContext}
+     *
+     * @return
+     */
+    protected Set<HandlerMethod> getHandlerMethods() {
+        return annotatedMethodsCache.keySet();
+    }
+
+    /**
+     * Get a {@link ApplicationContext} instance
+     *
+     * @return a {@link ApplicationContext} instance
+     */
+    protected ApplicationContext getApplicationContext() {
+        return this.applicationContext;
+    }
+
+    private void initHandlerMethods(Collection<HandlerMethod> handlerMethods) {
+
+        for (HandlerMethod handlerMethod : handlerMethods) {
+
+            Method method = handlerMethod.getMethod();
+
+            A annotation = findAnnotation(method, annotationType);
+
+            if (annotation != null) {
+
+                initAnnotatedMethodsCache(handlerMethod, annotation);
+
+                initHandlerMethod(handlerMethod, annotation);
+
+            }
+        }
+    }
+
+    private void initAnnotatedMethodsCache(HandlerMethod method, A annotation) {
+        annotatedMethodsCache.put(method, annotation);
+    }
+
+    /**
+     * Customize to initialize {@link HandlerMethod} and {@link A annotation} on Sub-Class If requried.
+     *
+     * @param handlerMethod {@link HandlerMethod} a handler method annotated {@link A}
+     * @param annotation    {@link A annotation} annotated on handlerMethod
+     */
+    protected void initHandlerMethod(HandlerMethod handlerMethod, A annotation) {
+
+    }
+
 
 }
