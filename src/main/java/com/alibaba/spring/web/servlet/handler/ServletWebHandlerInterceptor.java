@@ -5,16 +5,18 @@ import com.alibaba.spring.web.handler.WebPreHandler;
 import com.alibaba.spring.web.handler.annotation.WebHandlers;
 import com.alibaba.spring.web.server.ServerHttpExchange;
 import com.alibaba.spring.web.servlet.server.ServletServerHttpExchange;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.*;
 
-import static com.alibaba.spring.util.BeanUtils.getSortedBeans;
-import static java.util.Arrays.asList;
+import static java.lang.reflect.Modifier.isAbstract;
+import static org.springframework.beans.factory.BeanFactoryUtils.beansOfTypeIncludingAncestors;
 import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
 /**
@@ -27,32 +29,63 @@ import static org.springframework.core.annotation.AnnotationAwareOrderComparator
  */
 public class ServletWebHandlerInterceptor extends AnnotatedHandlerMethodHandlerInterceptorAdapter<WebHandlers> {
 
-    private final Map<HandlerMethod, List<WebPreHandler>> handlerMethodWebPreHandlers =
-            new HashMap<HandlerMethod, List<WebPreHandler>>();
+    private final Map<Method, List<WebPreHandler>> handlerMethodWebPreHandlers =
+            new HashMap<Method, List<WebPreHandler>>();
 
     @Override
     protected void initHandlerMethod(HandlerMethod handlerMethod, WebHandlers webHandlers) {
 
-        Set<Class<? extends WebHandler>> webHandlerClasses =
-                new HashSet<Class<? extends WebHandler>>(asList(webHandlers.value()));
+        Set<Class<? extends WebHandler>> webHandlerClasses = resolveWebHandlerClasses(webHandlers);
+
+        initWebPreHandlers(handlerMethod, webHandlerClasses);
+
+    }
+
+    private Set<Class<? extends WebHandler>> resolveWebHandlerClasses(WebHandlers webHandlers) {
+
+        Set<Class<? extends WebHandler>> webHandlerClasses = new LinkedHashSet<Class<? extends WebHandler>>();
+
+        for (Class<? extends WebHandler> webHandlerClass : webHandlers.value()) {
+            assertWebHandlerClass(webHandlerClass);
+            webHandlerClasses.add(webHandlerClass);
+        }
+
+        return webHandlerClasses;
+    }
+
+    private static void assertWebHandlerClass(Class<? extends WebHandler> webHandlerClass) {
+
+        Assert.isTrue(!webHandlerClass.isInterface(),
+                "@WebHandlers.value() attribute must not be an interface!");
+        Assert.isTrue(!isAbstract(webHandlerClass.getModifiers()),
+                "@WebHandlers.value() attribute must not be an abstract class!");
+
+    }
+
+    private List<WebPreHandler> filterWebPreHandlers(Set<Class<? extends WebHandler>> webHandlerClasses) {
 
         List<WebPreHandler> webPreHandlers = new LinkedList<WebPreHandler>();
 
         for (Class<? extends WebHandler> webHandlerClass : webHandlerClasses) {
 
-            if (ClassUtils.isAssignable(WebPreHandler.class,webHandlerClass)) { // WebPreHandler
-                webPreHandlers.addAll(getSortedBeans(getApplicationContext(), WebPreHandler.class));
+            if (ClassUtils.isAssignable(WebPreHandler.class, webHandlerClass)) { // WebPreHandler
+                webPreHandlers.addAll(beansOfTypeIncludingAncestors(getApplicationContext(), WebPreHandler.class).values());
             }
 
         }
 
-        initWebPreHandlers(handlerMethod, webPreHandlers);
+        sort(webPreHandlers);
 
+        return webPreHandlers;
     }
 
-    private void initWebPreHandlers(HandlerMethod handlerMethod, List<WebPreHandler> webPreHandlers) {
-        sort(webPreHandlers);
-        handlerMethodWebPreHandlers.put(handlerMethod, webPreHandlers);
+    private void initWebPreHandlers(HandlerMethod handlerMethod, Set<Class<? extends WebHandler>> webHandlerClasses) {
+
+        List<WebPreHandler> webPreHandlers = filterWebPreHandlers(webHandlerClasses);
+
+        Method method = handlerMethod.getMethod();
+        handlerMethodWebPreHandlers.put(method, webPreHandlers);
+
     }
 
     @Override
@@ -81,8 +114,9 @@ public class ServletWebHandlerInterceptor extends AnnotatedHandlerMethodHandlerI
 
     }
 
-    private List<WebPreHandler> getWebPreHandlers(Object handlerMethod) {
-        return handlerMethodWebPreHandlers.get(handlerMethod);
+    private List<WebPreHandler> getWebPreHandlers(HandlerMethod handlerMethod) {
+        Method method = handlerMethod.getMethod();
+        return handlerMethodWebPreHandlers.get(method);
     }
 
 }

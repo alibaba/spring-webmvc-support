@@ -38,22 +38,41 @@ public abstract class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends 
 
     private final Class<A> annotationType;
 
-    private final Map<HandlerMethod, A> annotatedMethodsCache;
+    private final Map<Method, A> annotatedMethodsCache;
+
+    private final boolean autoRegistered;
 
     private ApplicationContext applicationContext;
 
+    /**
+     * Default Constructor with auto-registering into {@link HandlerInterceptor} chain If current instance is declared
+     * as a Spring Bean.
+     *
+     * @see #AnnotatedHandlerMethodHandlerInterceptorAdapter(boolean)
+     */
     protected AnnotatedHandlerMethodHandlerInterceptorAdapter() {
+        this(true);
+    }
+
+    /**
+     * @param autoRegistered If <code>true</code>, that means current instance as a Spring Bean will be registered into
+     *                       {@link HandlerInterceptor} chain.
+     */
+    protected AnnotatedHandlerMethodHandlerInterceptorAdapter(boolean autoRegistered) {
 
         annotationType = resolveAnnotationType();
 
-        annotatedMethodsCache = new HashMap<HandlerMethod, A>();
+        annotatedMethodsCache = new HashMap<Method, A>();
 
+        this.autoRegistered = autoRegistered;
     }
 
     @Override
     public final void addInterceptors(InterceptorRegistry registry) {
-        // Add Itself
-        registry.addInterceptor(this);
+        // Add Itself if autoRegistered is true
+        if (autoRegistered) {
+            registry.addInterceptor(this);
+        }
     }
 
     public final boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -217,19 +236,28 @@ public abstract class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends 
     /**
      * Get an annotated {@link Annotation} instance from somewhere,e.g {@link HandlerMethod}
      *
-     * @param handler {@link HandlerMethod}
-     * @return
+     * @param handler {@link HandlerMethod} or {@link Method}
+     * @return {@link Annotation}
      */
     protected A getAnnotation(Object handler) {
-        return annotatedMethodsCache.get(handler);
+
+        Method method = null;
+
+        if (handler instanceof HandlerMethod) {
+            method = ((HandlerMethod) handler).getMethod();
+        } else if (handler instanceof Method) {
+            method = (Method) handler;
+        }
+
+        return method == null ? null : annotatedMethodsCache.get(method);
     }
 
     /**
-     * Find all {@link HandlerMethod } in current {@link ApplicationContext}
+     * Find all annotated {@link Method} in current {@link ApplicationContext}
      *
-     * @return
+     * @return {@link Method} Set
      */
-    protected Set<HandlerMethod> getHandlerMethods() {
+    protected Set<Method> getAnnotatedMethods() {
         return annotatedMethodsCache.keySet();
     }
 
@@ -248,7 +276,18 @@ public abstract class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends 
 
             Method method = handlerMethod.getMethod();
 
+            // Find @Annotation from Method first
             A annotation = findAnnotation(method, annotationType);
+
+            // If Absent , try to find @Annotation from Bean Type later
+
+            if (annotation == null) {
+
+                Class<?> beanType = handlerMethod.getBeanType();
+
+                annotation = findAnnotation(beanType, annotationType);
+
+            }
 
             if (annotation != null) {
 
@@ -260,7 +299,10 @@ public abstract class AnnotatedHandlerMethodHandlerInterceptorAdapter<A extends 
         }
     }
 
-    private void initAnnotatedMethodsCache(HandlerMethod method, A annotation) {
+    private void initAnnotatedMethodsCache(HandlerMethod handlerMethod, A annotation) {
+
+        Method method = handlerMethod.getMethod();
+
         annotatedMethodsCache.put(method, annotation);
     }
 
