@@ -1,19 +1,23 @@
 package com.alibaba.spring.web.servlet.handler;
 
-import com.alibaba.spring.web.method.HandlerMethodResolver;
 import com.alibaba.spring.web.servlet.mvc.controller.TestController;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.ui.Model;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,30 +31,28 @@ import java.util.Collection;
  * @see AnnotatedHandlerMethodHandlerInterceptorAdapter
  * @since 2017.02.02
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(classes = {
+        TestController.class,
+        RequestMappingHandlerMapping.class,
+        AnnotatedHandlerMethodHandlerInterceptorAdapterTest.RequestMappingMethodHandlerInterceptorAdapter.class}
+)
 public class AnnotatedHandlerMethodHandlerInterceptorAdapterTest {
-
-    private MockServletContext servletContext;
 
     private MockHttpServletRequest request;
 
-    private MockHttpServletResponse response;
-
-    private ModelAndView modelAndView;
-
-    private RequestMappingMethodHandlerInterceptorAdapter requestMappingMethodHandlerInterceptor;
-
     private Collection<HandlerMethod> handlerMethods;
+
+    @Autowired
+    private RequestMappingMethodHandlerInterceptorAdapter requestMappingMethodHandlerInterceptor;
 
     @Before
     public void init() {
 
-        HandlerMethodResolver handlerMethodResolver = new HandlerMethodResolver();
-
-        servletContext = new MockServletContext();
+        MockServletContext servletContext = new MockServletContext();
 
         request = new MockHttpServletRequest(servletContext);
-
-        requestMappingMethodHandlerInterceptor = new RequestMappingMethodHandlerInterceptorAdapter();
 
         HandlerMethod handlerMethod = new HandlerMethod(new TestController(),
                 ReflectionUtils.findMethod(TestController.class, "echo", Model.class));
@@ -64,13 +66,13 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapterTest {
 
         for (HandlerMethod handlerMethod : handlerMethods) {
 
-            boolean result = requestMappingMethodHandlerInterceptor.preHandle(request, response, handlerMethod);
+            boolean result = requestMappingMethodHandlerInterceptor.preHandle(request, null, handlerMethod);
 
             Assert.assertFalse(result);
 
         }
 
-        boolean result = requestMappingMethodHandlerInterceptor.preHandle(request, response, new Object());
+        boolean result = requestMappingMethodHandlerInterceptor.preHandle(request, null, new Object());
 
         Assert.assertTrue(result);
 
@@ -81,11 +83,11 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapterTest {
 
         for (HandlerMethod handlerMethod : handlerMethods) {
 
-            requestMappingMethodHandlerInterceptor.postHandle(request, response, handlerMethod, modelAndView);
+            requestMappingMethodHandlerInterceptor.postHandle(request, null, handlerMethod, null);
 
         }
 
-        requestMappingMethodHandlerInterceptor.postHandle(request, response, new Object(), modelAndView);
+        requestMappingMethodHandlerInterceptor.postHandle(request, null, new Object(), null);
 
     }
 
@@ -94,11 +96,11 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapterTest {
 
         for (HandlerMethod handlerMethod : handlerMethods) {
 
-            requestMappingMethodHandlerInterceptor.afterCompletion(request, response, handlerMethod, new Exception());
+            requestMappingMethodHandlerInterceptor.afterCompletion(request, null, handlerMethod, new Exception());
 
         }
 
-        requestMappingMethodHandlerInterceptor.afterCompletion(request, response, new Object(), new Exception());
+        requestMappingMethodHandlerInterceptor.afterCompletion(request, null, new Object(), new Exception());
 
     }
 
@@ -107,11 +109,11 @@ public class AnnotatedHandlerMethodHandlerInterceptorAdapterTest {
 
         for (HandlerMethod handlerMethod : handlerMethods) {
 
-            requestMappingMethodHandlerInterceptor.afterConcurrentHandlingStarted(request, response, handlerMethod);
+            requestMappingMethodHandlerInterceptor.afterConcurrentHandlingStarted(request, null, handlerMethod);
 
         }
 
-        requestMappingMethodHandlerInterceptor.afterConcurrentHandlingStarted(request, response, new Object());
+        requestMappingMethodHandlerInterceptor.afterConcurrentHandlingStarted(request, null, new Object());
 
     }
 

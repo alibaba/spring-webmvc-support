@@ -25,8 +25,6 @@ import java.util.*;
 @Repository
 public class HandlerMethodRepository implements ApplicationListener<ContextRefreshedEvent> {
 
-    private static final Map<Object, HandlerMethod> STUB_HANDLER_METHOD_CACHE = Collections.emptyMap();
-
     /**
      * ApplicationContext aware {@link HandlerMethod} cache
      */
