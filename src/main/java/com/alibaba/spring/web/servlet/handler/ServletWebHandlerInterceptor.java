@@ -29,8 +29,8 @@ import static org.springframework.core.annotation.AnnotationAwareOrderComparator
  */
 public class ServletWebHandlerInterceptor extends AnnotatedHandlerMethodHandlerInterceptorAdapter<WebHandlers> {
 
-    private final Map<Method, List<WebPreHandler>> handlerMethodWebPreHandlers =
-            new HashMap<Method, List<WebPreHandler>>();
+    private final Map<Method, Set<WebPreHandler>> handlerMethodWebPreHandlers =
+            new HashMap<Method, Set<WebPreHandler>>();
 
     @Override
     protected void initHandlerMethod(HandlerMethod handlerMethod, WebHandlers webHandlers) {
@@ -62,26 +62,29 @@ public class ServletWebHandlerInterceptor extends AnnotatedHandlerMethodHandlerI
 
     }
 
-    private List<WebPreHandler> filterWebPreHandlers(Set<Class<? extends WebHandler>> webHandlerClasses) {
+    private Set<WebPreHandler> filterWebPreHandlers(Set<Class<? extends WebHandler>> webHandlerClasses) {
 
         List<WebPreHandler> webPreHandlers = new LinkedList<WebPreHandler>();
 
         for (Class<? extends WebHandler> webHandlerClass : webHandlerClasses) {
 
             if (ClassUtils.isAssignable(WebPreHandler.class, webHandlerClass)) { // WebPreHandler
-                webPreHandlers.addAll(beansOfTypeIncludingAncestors(getApplicationContext(), WebPreHandler.class).values());
+                Class<? extends WebPreHandler> webPreHandlerClass = (Class<? extends WebPreHandler>) webHandlerClass;
+                webPreHandlers.addAll(beansOfTypeIncludingAncestors(getApplicationContext(), webPreHandlerClass).values());
             }
 
         }
 
+        // sort
         sort(webPreHandlers);
 
-        return webPreHandlers;
+        // remove duplicated instances
+        return new LinkedHashSet<WebPreHandler>(webPreHandlers);
     }
 
     private void initWebPreHandlers(HandlerMethod handlerMethod, Set<Class<? extends WebHandler>> webHandlerClasses) {
 
-        List<WebPreHandler> webPreHandlers = filterWebPreHandlers(webHandlerClasses);
+        Set<WebPreHandler> webPreHandlers = filterWebPreHandlers(webHandlerClasses);
 
         Method method = handlerMethod.getMethod();
         handlerMethodWebPreHandlers.put(method, webPreHandlers);
@@ -92,7 +95,7 @@ public class ServletWebHandlerInterceptor extends AnnotatedHandlerMethodHandlerI
     protected boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                                 HandlerMethod handlerMethod, WebHandlers annotation) throws Exception {
 
-        List<WebPreHandler> webPreHandlers = getWebPreHandlers(handlerMethod);
+        Set<WebPreHandler> webPreHandlers = getWebPreHandlers(handlerMethod);
 
         Boolean accepted = null;
 
@@ -114,7 +117,7 @@ public class ServletWebHandlerInterceptor extends AnnotatedHandlerMethodHandlerI
 
     }
 
-    private List<WebPreHandler> getWebPreHandlers(HandlerMethod handlerMethod) {
+    private Set<WebPreHandler> getWebPreHandlers(HandlerMethod handlerMethod) {
         Method method = handlerMethod.getMethod();
         return handlerMethodWebPreHandlers.get(method);
     }
